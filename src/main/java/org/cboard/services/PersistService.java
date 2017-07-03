@@ -28,13 +28,13 @@ public class PersistService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersistService.class);
 
-    @Value("${phantomjs_path}")
+    @Value("${phantomjs.path}")
     private String phantomjsPath;
     private String scriptPath = new File(this.getClass().getResource("/phantom.js").getFile()).getPath();
 
-    @Value("${web_port}")
+    @Value("${web.port}")
     private String webPort;
-    @Value("${web_context}")
+    @Value("${web.context}")
     private String webContext;
 
     private static final ConcurrentMap<String, PersistContext> TASK_MAP = new ConcurrentHashMap<>();

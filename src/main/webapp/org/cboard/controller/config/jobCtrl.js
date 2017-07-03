@@ -4,7 +4,7 @@
 cBoard.controller('jobCtrl', function ($scope, $rootScope, $http, dataService, $uibModal, ModalUtils, $filter, $interval) {
     var translate = $filter('translate');
 
-    $scope.jobTypes = [{name: 'Send Mail', type: 'mail'}];
+    $scope.jobTypes = [{name: '邮件推送', type: 'mail'}];
 
     $scope.interval = $interval(function () {
         $http.get("dashboard/getJobList.do").success(function (response) {
