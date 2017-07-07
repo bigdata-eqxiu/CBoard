@@ -11,9 +11,9 @@
                         <i class="fa fa-trash-o toolbar-icon"  ng-click="deleteNode()" title="{{'COMMON.DELETE'|translate}}"></i>&nbsp;&nbsp;
                         <i class="fa fa-plus toolbar-icon" title="{{'COMMON.NEW'|translate}}" ng-click="newOperate()"></i>
                         <div class="newBoard hideOperate">
-                            <!--<span class="newFreeLayout" ng-click="newFreeLayout()">New free layout</span>-->
-                            <span class="newGridLayout" ng-click="newGridLayout()">New grid layout</span>
-                            <span class="newGridLayout" ng-click="newTimelineLayout()">New timeline layout</span>
+                            <!--<span class="newFreeLayout" ng-click="newFreeLayout()">自由布局</span>-->
+                            <span class="newGridLayout" ng-click="newGridLayout()">表格布局</span>
+                            <span class="newGridLayout" ng-click="newTimelineLayout()">时间线布局</span>
                         </div>
                     </div>
                 </div>
@@ -38,11 +38,11 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-danger pull-right">{{'COMMON.CANCEL'|translate}}</button>
-                                        <a class="btn btn-success pull-right" ng-click="checkBeforPreview(curBoard.id)" target="_blank"
+                                        <button type="submit" class="btn btn-link pull-right">{{'COMMON.CANCEL'|translate}}</button>
+                                        <a class="btn btn-link pull-right" ng-click="checkBeforPreview(curBoard.id)" target="_blank"
                                                 style="margin-right: 5px">{{'CONFIG.DASHBOARD.PREVIEW'|translate}}
                                         </a>
-                                        <button type="submit" class="btn btn-success pull-right" ng-click="saveBoard()"
+                                        <button type="submit" class="btn btn-link pull-right" ng-click="saveBoard()"
                                                 style="margin-right: 5px">{{'COMMON.SAVE'|translate}}
                                         </button>
                                     </div>
@@ -86,11 +86,11 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-danger pull-right">{{'COMMON.CANCEL'|translate}}</button>
-                                    <a class="btn btn-success pull-right" ng-click="checkBeforPreview(curBoard.id)" target="_blank"
+                                    <button type="submit" class="btn btn-link pull-right">{{'COMMON.CANCEL'|translate}}</button>
+                                    <a class="btn btn-link pull-right" ng-click="checkBeforPreview(curBoard.id)" target="_blank"
                                        style="margin-right: 5px">{{'CONFIG.DASHBOARD.PREVIEW'|translate}}
                                     </a>
-                                    <button type="submit" class="btn btn-success pull-right" ng-click="saveBoard()"
+                                    <button type="submit" class="btn btn-link pull-right" ng-click="saveBoard()"
                                             style="margin-right: 5px">{{'COMMON.SAVE'|translate}}
                                     </button>
                                 </div>

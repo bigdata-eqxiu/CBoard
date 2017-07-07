@@ -35,10 +35,10 @@
             </div>
             <div class="row" style="padding-top: 5px">
                 <div class="col-md-12">
-                    <button type="submit" ng-click="revokeRole()" class="btn btn-danger">
+                    <button type="submit" ng-click="revokeRole()" class="btn btn-link">
                         撤销
                     </button>
-                    <button type="submit" ng-click="grantRole()" class="btn btn-success pull-right">
+                    <button type="submit" ng-click="grantRole()" class="btn btn-link pull-right">
                         授权
                     </button>
                 </div>
@@ -73,7 +73,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10" style="padding-right: 0px; padding-top: 5px">
-                            <button type="submit" ng-disabled="selectRole.length!=1" ng-click="grantRes()" class="btn btn-success pull-right">
+                            <button type="submit" ng-disabled="selectRole.length!=1" ng-click="grantRes()" class="btn btn-link pull-right">
                                 授权
                             </button>
                         </div>
@@ -104,7 +104,7 @@
                 </div>
                 <!-- /.box-body -->
                 <div class="box-footer">
-                    <button type="submit" ng-click="saveUser()" class="btn btn-success pull-right"
+                    <button type="submit" ng-click="saveUser()" class="btn btn-link pull-right"
                             style="margin-right: 5px">{{'COMMON.SAVE'|translate}}
                     </button>
                 </div>
@@ -136,7 +136,7 @@
                 </div>
                 <!-- /.box-body -->
                 <div class="box-footer">
-                    <button type="submit" ng-click="saveRole()" class="btn btn-success pull-right"
+                    <button type="submit" ng-click="saveRole()" class="btn btn-link pull-right"
                             style="margin-right: 5px">{{'COMMON.SAVE'|translate}}
                     </button>
                 </div>

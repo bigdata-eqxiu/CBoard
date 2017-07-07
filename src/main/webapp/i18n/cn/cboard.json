@@ -74,7 +74,7 @@
     "DATA_SOURCE": {
       "DATA_SOURCE_HEADER": "数据源",
       "DATA_PROVIDER": "数据源类型",
-      "NAME": "新建数据源名称",
+      "NAME": "数据源名称",
       "TEST": "测试"
     },
     "WIDGET": {
@@ -278,7 +278,7 @@
       "JDBCURL": "连接串 (如: jdbc:mysql://hostname:port/db)",
       "USERNAME": "数据库用户名",
       "PASSWORD": "数据库密码",
-      "POOLEDCONNECTION": "是否使用连接池",
+      "POOLEDCONNECTION": "使用连接池",
       "SQLTEXT": "查询语句"
     },
     "SAIKU": {
