@@ -98,3 +98,5 @@ hs_err_pid*
 
 **/CElasticsearchDataProvider.java
 /src/main/filters/
+/src/test/test.iml
+/src/main/main.iml
