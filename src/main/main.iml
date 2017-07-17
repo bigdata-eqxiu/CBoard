@@ -11,6 +11,19 @@
         </webroots>
       </configuration>
     </facet>
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/resources/spring-security-jdbc.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring-mybatis.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring-cacher-ehcache.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring-security.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring-mvc.xml</file>
+          <file>file://$MODULE_DIR$/resources/spring-cacher-redis.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
@@ -19,5 +32,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:4.3.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:4.3.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.29" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.tomcat:tomcat-catalina:7.0.52" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:druid:1.0.27" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:18.0" level="project" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
   </component>
 </module>
