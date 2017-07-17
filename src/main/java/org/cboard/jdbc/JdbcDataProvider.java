@@ -460,10 +460,12 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
                 return "MAX(" + aggExp + ")";
             case "min":
                 return "MIN(" + aggExp + ")";
+            case "count":
+                return "COUNT(" + aggExp + ")";
             case "distinct":
                 return "COUNT(DISTINCT " + aggExp + ")";
             default:
-                return "COUNT(" + aggExp + ")";
+                return "(" + aggExp + ")";
         }
     };
 
