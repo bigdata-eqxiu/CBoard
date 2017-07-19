@@ -481,7 +481,7 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
                     delete c.formatter;
                 });
             });
-            $scope.preview();
+            // $scope.preview();
         };
 
         $scope.newConfig = function () {
