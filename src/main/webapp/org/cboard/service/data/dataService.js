@@ -151,7 +151,12 @@ cBoard.service('dataService', function ($http, $q, updateService) {
                 cfg: angular.toJson(cfg),
                 reload: reload
             }).success(function (data) {
-                var result = castRawData2Series(data, chartConfig);
+                var result = null;
+                if (chartConfig.keys.length == 0) {
+                    result = castRawData2Columns(data, chartConfig);
+                } else {
+                    result = castRawData2Series(data, chartConfig);
+                }
                 result.chartConfig = chartConfig;
                 if (!_.isUndefined(datasetId)) {
                     getDrillConfig(datasetId, chartConfig).then(function (c) {
@@ -318,7 +323,11 @@ cBoard.service('dataService', function ($http, $q, updateService) {
     var configToDataSeries = function (config) {
         switch (config.type) {
             case 'exp':
-                return getExpSeries(config.exp);
+                // return getExpSeries(config.exp);
+                return [{
+                    name: config.exp,
+                    aggregate: config.exp
+                }];
                 break;
             default:
                 return [{
@@ -430,6 +439,54 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         return result;
     };
     this.toNumber = toNumber;
+
+    // 原始数据转为明细数据：
+    var castRawData2Columns = function (rawData, chartConfig) {
+        // keys, 二维数组，用行号作为keys，示例：[["1"], ["2"], ["3"]]
+        var keys = [];
+        for (var i = 0; i < rawData.data.length; i++) {
+            keys.push([i]);
+        }
+
+        // data, 二维数组，[["a", "b", "c"], ["A", "B", "C"]]，第一维对应列，每个列对应一个元素
+        var data = [];
+        for (var i = 0; i < rawData.columnList.length; i++) {
+            data[i] = [];
+            for (var j = 0; j < rawData.data.length; j++) {
+                data[i][j] = rawData.data[j][i];
+            }
+        }
+
+        // series，二维数组，[["列1"], ["列2"]]
+        var castedAliasSeriesName = [];
+        // seriesConfig，对象。{"列1": {type:"", valueAxisIndex: "", formatter: ""}, ...}
+        var aliasSeriesConfig = {};
+        for (var i = 0; i < rawData.columnList.length; i++) {
+            var name = rawData.columnList[i].name;
+            var aliasName = null;
+            try {
+                aliasName = chartConfig.values[0].cols[i].alias;
+            } catch (e) {
+            }
+            if (!aliasName)
+                aliasName = name;
+            castedAliasSeriesName.push([aliasName]);
+            aliasSeriesConfig[aliasName] = {
+                type: "",
+                valueAxisIndex: i,
+                formatter: null
+            };
+        }
+
+
+        return {
+            keys: keys,
+            data: data,
+            series: castedAliasSeriesName,
+            seriesConfig: aliasSeriesConfig,
+            chartConfig: chartConfig
+        };
+    }
 
     /**
      * Cast the aggregated raw data into data series
@@ -738,7 +795,7 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         });
 
         var names = []; // expression text in aggreagtion function, could be a columnName or script
-        _.each(evalExp.match(/(sum|avg|count|max|min|distinct)\("?.*?"?\)/g), function (aggUnit) {
+        _.each(evalExp.match(/(sum|avg|count|max|min|distinct)?\("?.*?"?\)/g), function (aggUnit) {
             var aggregate = aggUnit.substring(0, aggUnit.indexOf('('));
             var name = aggUnit.substring(aggUnit.indexOf('(') + 1, aggUnit.indexOf(')'));
             if (name.match("_#")) {
