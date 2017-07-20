@@ -82,12 +82,13 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
         ];
 
         $scope.value_aggregate_types = [
-            {name: 'sum', value: 'sum'},
-            {name: 'count', value: 'count'},
-            {name: 'avg', value: 'avg'},
-            {name: 'max', value: 'max'},
-            {name: 'min', value: 'min'},
-            {name: 'distinct', value: 'distinct'}
+            {name: '求和', value: 'sum'},
+            {name: '计数', value: 'count'},
+            {name: '计数（不重复）', value: 'distinct'},
+            {name: '平均', value: 'avg'},
+            {name: '最大值', value: 'max'},
+            {name: '最小值', value: 'min'},
+            {name: '无（不聚合）', value: ''}
         ];
 
         $scope.kpi_styles = [
