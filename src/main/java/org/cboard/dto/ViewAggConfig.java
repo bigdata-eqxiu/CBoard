@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
  */
 public class ViewAggConfig {
 
+    private String chartType;
+
     private List<DimensionConfig> rows;
     private List<DimensionConfig> columns;
     private List<DimensionConfig> filters;
@@ -30,6 +32,7 @@ public class ViewAggConfig {
                 aggConfig.setFilters(new ArrayList<>());
             }
             aggConfig.setValues(viewAggConfig.getValues());
+            aggConfig.setChartType(viewAggConfig.getChartType());
             return aggConfig;
         }
         return null;
@@ -65,5 +68,13 @@ public class ViewAggConfig {
 
     public void setValues(List<ValueConfig> values) {
         this.values = values;
+    }
+
+    public String getChartType() {
+        return chartType;
+    }
+
+    public void setChartType(String chartType) {
+        this.chartType = chartType;
     }
 }

@@ -3,7 +3,7 @@
  */
 'use strict';
 cBoard.service('chartService', function ($q, dataService, chartPieService, chartLineService, chartFunnelService,
-                                         chartSankeyService, chartTableService, chartKpiService, chartRadarService, chartMapService, chartScatterService) {
+                                         chartSankeyService, chartTableService, chartGridService, chartKpiService, chartRadarService, chartMapService, chartScatterService) {
 
         this.render = function (containerDom, widget, optionFilter, scope, reload, persist) {
             var deferred = $q.defer();
@@ -115,6 +115,9 @@ cBoard.service('chartService', function ($q, dataService, chartPieService, chart
                     chart = chartKpiService;
                     break;
                 case 'table':
+                    chart = chartTableService;
+                    break;
+                case 'grid':
                     chart = chartTableService;
                     break;
                 case 'funnel':

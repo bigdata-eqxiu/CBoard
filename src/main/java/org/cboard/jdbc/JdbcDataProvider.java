@@ -74,6 +74,8 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
 
     private DimensionConfigHelper dimensionConfigHelper;
 
+    private ValueConfigHelper valueConfigHelper;
+
     @Override
     public boolean doAggregationInDataSource() {
         String v = dataSource.get(aggregateProvider);
@@ -218,7 +220,7 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
 
     private String configComponentToSql(ConfigComponent cc) {
         if (cc instanceof DimensionConfig) {
-            return filter2SqlCondtion.apply((DimensionConfig) cc);
+            return filter2SqlCondition.apply((DimensionConfig) cc);
         } else if (cc instanceof CompositeConfig) {
             CompositeConfig compositeConfig = (CompositeConfig) cc;
             String sql = compositeConfig.getConfigComponents().stream().map(e -> separateNull(e)).map(e -> configComponentToSql(e)).collect(Collectors.joining(" " + compositeConfig.getType() + " "));
@@ -230,7 +232,7 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     /**
      * Parser a single filter configuration to sql syntax
      */
-    private Function<DimensionConfig, String> filter2SqlCondtion = (config) -> {
+    private Function<DimensionConfig, String> filter2SqlCondition = (config) -> {
         if (config.getValues().size() == 0) {
             return null;
         }
@@ -286,6 +288,69 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     };
 
     /**
+     * Parser a single filter configuration to sql syntax
+     */
+    private Function<ValueConfig, String> having2SqlCondition = (config) -> {
+        if (config.getValues().size() == 0) {
+            return null;
+        }
+
+        if(StringUtils.isEmpty(config.getValues().get(0))){
+            return null;
+        }
+
+        if (NULL_STRING.equals(config.getValues().get(0))) {
+            switch (config.getFilterType()) {
+                case "=":
+                case "≠":
+                    return config.getColumn() + ("=".equals(config.getFilterType()) ? " IS NULL" : " IS NOT NULL");
+            }
+        }
+
+        switch (config.getFilterType()) {
+            case "=":
+            case "eq":
+                return config.getColumn() + " IN (" + IntStream.range(0, config.getValues().size()).boxed().map(i -> valueConfigHelper.getValueStr(config, i)).collect(Collectors.joining(",")) + ")";
+            case "≠":
+            case "ne":
+                return config.getColumn() + " NOT IN (" + IntStream.range(0, config.getValues().size()).boxed().map(i -> valueConfigHelper.getValueStr(config, i)).collect(Collectors.joining(",")) + ")";
+            case ">":
+                return config.getColumn() + " > " + valueConfigHelper.getValueStr(config, 0);
+            case "<":
+                return config.getColumn() + " < " + valueConfigHelper.getValueStr(config, 0);
+            case "≥":
+                return config.getColumn() + " >= " + valueConfigHelper.getValueStr(config, 0);
+            case "≤":
+                return config.getColumn() + " <= " + valueConfigHelper.getValueStr(config, 0);
+            case "(a,b]":
+                if (config.getValues().size() >= 2) {
+                    return "(" + config.getColumn() + " > '" + valueConfigHelper.getValueStr(config, 0) + "' AND " + config.getColumn() + " <= " + valueConfigHelper.getValueStr(config, 1) + ")";
+                } else {
+                    return null;
+                }
+            case "[a,b)":
+                if (config.getValues().size() >= 2) {
+                    return "(" + config.getColumn() + " >= " + valueConfigHelper.getValueStr(config, 0) + " AND " + config.getColumn() + " < " + valueConfigHelper.getValueStr(config, 1) + ")";
+                } else {
+                    return null;
+                }
+            case "(a,b)":
+                if (config.getValues().size() >= 2) {
+                    return "(" + config.getColumn() + " > " + valueConfigHelper.getValueStr(config, 0) + " AND " + config.getColumn() + " < " + valueConfigHelper.getValueStr(config, 1) + ")";
+                } else {
+                    return null;
+                }
+            case "[a,b]":
+                if (config.getValues().size() >= 2) {
+                    return "(" + config.getColumn() + " >= " + valueConfigHelper.getValueStr(config, 0) + " AND " + config.getColumn() + " <= " + valueConfigHelper.getValueStr(config, 1) + ")";
+                } else {
+                    return null;
+                }
+        }
+        return null;
+    };
+
+    /**
      * Assemble all the filter to a legal sal where script
      *
      * @param filterStream
@@ -304,6 +369,40 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
         columns.setEmptyValue("");
         selectStream.map(m -> toSelect.apply(m, types)).filter(e -> e != null).forEach(columns::add);
         return columns.toString();
+    }
+
+    // 取排序字段的top属性，只能有一个排序字段
+    private String assembleSqlLimit(Stream<ValueConfig> topStream, String prefix) {
+        StringJoiner top = new StringJoiner("", prefix + " ", "");
+        top.setEmptyValue("");
+        topStream
+                .filter(e -> e.getSort() != null && !"".equals(e.getSort()) && e.getTop()>0)
+                .map(e -> " " + (e.getTop()))
+                .filter(e -> e != null)
+                .forEach(top::add);
+
+        if(top.length() == 0)
+            top.add("50000");
+
+        return top.toString();
+    }
+
+    private String assembleSqlHaving(Stream<ValueConfig> havingStream, String prefix) {
+        StringJoiner having = new StringJoiner("\nAND ", prefix + " ", "");
+        having.setEmptyValue("");
+        havingStream
+                .filter(e -> e.getValues()!=null && e.getValues().size()>0)
+                .map(e -> having2SqlCondition.apply(e))
+                .filter(e -> e!=null)
+                .forEach(having::add);
+        return having.toString();
+    }
+
+    private String assembleSqlOrder(Stream<ValueConfig> orderStream, String prefix){
+        StringJoiner order = new StringJoiner(", ", prefix + " ", "");
+        order.setEmptyValue("");
+        orderStream.filter(e -> e.getSort() != null && !"".equals(e.getSort())).map(e -> e.getColumn() + " " + e.getSort()).filter(e -> e != null).forEach(order::add);
+        return order.toString();
     }
 
     private String assembleDimColumns(Stream<DimensionConfig> columnsStream) {
@@ -422,6 +521,15 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
         String whereStr = assembleSqlFilter(filters, "WHERE");
         String groupByStr = StringUtils.isBlank(dimColsStr) ? "" : "GROUP BY " + dimColsStr;
 
+        String havingStr = "";
+        String orderByStr = "";
+        String limitStr = "";
+        if("grid".equals(config.getChartType())){
+            orderByStr = assembleSqlOrder(config.getValues().stream(), "ORDER BY");
+            havingStr = assembleSqlHaving(config.getValues().stream(), "HAVING");
+            limitStr = assembleSqlLimit(config.getValues().stream(), "LIMIT");
+        }
+
         StringJoiner selectColsStr = new StringJoiner(",");
         if (!StringUtils.isBlank(dimColsStr)) {
             selectColsStr.add(dimColsStr);
@@ -431,8 +539,8 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
         }
 
         String subQuerySql = getAsSubQuery(query.get(SQL));
-        String fsql = "\nSELECT %s \n FROM (\n%s\n) view____ \n %s \n %s";
-        String exec = String.format(fsql, selectColsStr, subQuerySql, whereStr, groupByStr);
+        String fsql = "\nSELECT %s \n FROM (\n%s\n) view____ \n %s \n %s \n %s \n %s \n %s";
+        String exec = String.format(fsql, selectColsStr, subQuerySql, whereStr, groupByStr, havingStr, orderByStr, limitStr);
         return exec;
     }
 
@@ -462,8 +570,10 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
                 return "MIN(" + aggExp + ")";
             case "distinct":
                 return "COUNT(DISTINCT " + aggExp + ")";
-            default:
+            case "count":
                 return "COUNT(" + aggExp + ")";
+            default:
+                return aggExp;
         }
     };
 
@@ -471,6 +581,7 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     public void afterPropertiesSet() throws Exception {
         try {
             dimensionConfigHelper = new DimensionConfigHelper();
+            valueConfigHelper = new ValueConfigHelper();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -484,6 +595,33 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
 
         public String getValueStr(DimensionConfig dc, int index) {
             switch (types.get(dc.getColumnName())) {
+                case Types.VARCHAR:
+                case Types.CHAR:
+                case Types.NVARCHAR:
+                case Types.NCHAR:
+                case Types.CLOB:
+                case Types.NCLOB:
+                case Types.LONGVARCHAR:
+                case Types.LONGNVARCHAR:
+                case Types.DATE:
+                case Types.TIMESTAMP:
+                case Types.TIMESTAMP_WITH_TIMEZONE:
+                    return "'" + dc.getValues().get(index) + "'";
+                default:
+                    return dc.getValues().get(index);
+            }
+        }
+
+    }
+
+    private class ValueConfigHelper {
+        private Map<String, Integer> types = getColumnType();
+
+        private ValueConfigHelper() throws Exception {
+        }
+
+        public String getValueStr(ValueConfig dc, int index) {
+            switch (types.get(dc.getColumn())) {
                 case Types.VARCHAR:
                 case Types.CHAR:
                 case Types.NVARCHAR:

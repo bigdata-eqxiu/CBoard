@@ -61,11 +61,16 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
                 row: translate('CONFIG.WIDGET.TIPS_DIM_NUM_1_MORE'),
                 column: translate('CONFIG.WIDGET.TIPS_DIM_NUM_0_MORE'),
                 measure: translate('CONFIG.WIDGET.TIPS_DIM_NUM_1_MORE')
+            },{
+                name: translate('CONFIG.WIDGET.GRID'), value: 'grid', class: 'cGrid',
+                row: translate('CONFIG.WIDGET.TIPS_DIM_NUM_0'),
+                column: translate('CONFIG.WIDGET.TIPS_DIM_NUM_0'),
+                measure: translate('CONFIG.WIDGET.TIPS_DIM_NUM_1_MORE')
             }
         ];
 
         $scope.chart_types_status = {
-            "line": true, "pie": true, "kpi": true, "table": true,
+            "line": true, "pie": true, "kpi": true, "table": true, "grid": true,
             "funnel": true, "sankey": true, "radar": true, "map": true, "scatter": true
         };
 
@@ -97,6 +102,7 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
             pie: {keys: 0, groups: 0, filters: 0, values: 0},
             kpi: {keys: -1, groups: -1, filters: 0, values: 1},
             table: {keys: 0, groups: 0, filters: 0, values: 0},
+            grid: {keys: -1, groups: -1, filters: -1, values: 0},
             funnel: {keys: 0, groups: -1, filters: 0, values: 0},
             sankey: {keys: 0, groups: 0, filters: 0, values: 1},
             radar: {keys: 0, groups: 0, filters: 0, values: 0},
@@ -527,6 +533,14 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
                     }];
                     $scope.curWidget.config.filters = new Array();
                     break;
+                case 'grid':
+                    $scope.curWidget.config.selects = angular.copy($scope.columns);
+                    $scope.curWidget.config.values = [{
+                        name: '',
+                        cols: []
+                    }];
+                    $scope.curWidget.config.filters = new Array();
+                    break;
                 case 'funnel':
                     $scope.curWidget.config.selects = angular.copy($scope.columns);
                     $scope.curWidget.config.keys = new Array();
@@ -925,6 +939,11 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
                     list[index] = {col: item.col, aggregate_type: 'sum'};
                 } else if (type == 'select' || type == 'measure') {
                     list[index] = {col: item.column, aggregate_type: 'sum'};
+                }
+            },
+            toDetail: function (list, index, item, type){
+                if(type == 'measure'){
+                    list[index] = {col: item.column, aggregate_type: ''};
                 }
             },
             toSelect: function (list, index, item, type) {

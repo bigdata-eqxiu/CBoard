@@ -109,7 +109,8 @@
       "EXAMPLE": "如",
       "FUNNEL": "漏斗图",
       "SANKEY": "桑基图",
-      "TABLE": "表格",
+      "TABLE": "交叉表",
+      "GRID": "明细表",
       "KPI": "KPI",
       "PIE": "饼图",
       "LINE_BAR": "折线/柱状图",
@@ -145,7 +146,8 @@
       "SIZE": "大小",
       "COLOR": "透明度",
       "PREVIEW_QUERY": "预览查询",
-      "PERCENT_BAR": "百分比堆叠"
+      "PERCENT_BAR": "百分比堆叠",
+      "AGGREGATE_TYPE": "聚合类型"
     },
     "DASHBOARD": {
       "DASHBOARD": "看板",

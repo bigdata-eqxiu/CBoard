@@ -2,7 +2,7 @@
  * Created by yfyuan on 2016/10/28.
  */
 'use strict';
-cBoard.service('chartTableService', function () {
+cBoard.service('chartGridService', function () {
 
     this.render = function (containerDom, option, scope, persist, drill) {
         if (option == null) {

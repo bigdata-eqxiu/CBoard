@@ -136,13 +136,13 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         updateService.updateConfig(chartConfig);
         linkDataset(datasetId, chartConfig).then(function () {
             var dataSeries = getDataSeries(chartConfig);
-            var cfg = {rows: [], columns: [], filters: []};
+            var cfg = {rows: [], columns: [], filters: [], chartType: chartConfig.chart_type};
             cfg.rows = getDimensionConfig(chartConfig.keys);
             cfg.columns = getDimensionConfig(chartConfig.groups);
             cfg.filters = getDimensionConfig(chartConfig.filters);
             cfg.filters = cfg.filters.concat(getDimensionConfig(chartConfig.boardFilters));
             cfg.values = _.map(dataSeries, function (s) {
-                return {column: s.name, aggType: s.aggregate};
+                return {column: s.name, aggType: s.aggregate, sort: s.sort ? s.sort : '', values: s.values? s.values: [], filterType: s.filterType?s.filterType:'', top: s.top?s.top:0};
             });
             $http.post("dashboard/getAggregateData.do", {
                 datasourceId: datasource,
@@ -151,7 +151,15 @@ cBoard.service('dataService', function ($http, $q, updateService) {
                 cfg: angular.toJson(cfg),
                 reload: reload
             }).success(function (data) {
-                var result = castRawData2Series(data, chartConfig);
+                var result = null;
+                if(chartConfig.chart_type == 'grid'){
+                    result = castRawData2Columns(data, chartConfig);
+                }else{
+                    result = castRawData2Series(data, chartConfig);
+                }
+                if(result == null)
+                    return;
+
                 result.chartConfig = chartConfig;
                 if (!_.isUndefined(datasetId)) {
                     getDrillConfig(datasetId, chartConfig).then(function (c) {
@@ -268,13 +276,13 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         updateService.updateConfig(params.config);
         linkDataset(params.datasetId, params.config).then(function () {
             var dataSeries = getDataSeries(params.config);
-            var cfg = {rows: [], columns: [], filters: []};
+            var cfg = {rows: [], columns: [], filters: [], chartType: params.config.chart_type};
             cfg.rows = getDimensionConfig(params.config.keys);
             cfg.columns = getDimensionConfig(params.config.groups);
             cfg.filters = getDimensionConfig(params.config.filters);
             cfg.filters = cfg.filters.concat(getDimensionConfig(params.config.boardFilters));
             cfg.values = _.map(dataSeries, function (s) {
-                return {column: s.name, aggType: s.aggregate};
+                return {column: s.name, aggType: s.aggregate, sort: s.sort ? s.sort : '', values: s.values? s.values: [], filterType: s.filterType?s.filterType:'', top: s.top?s.top:0};
             });
             $http.post("dashboard/viewAggDataQuery.do", {
                 datasourceId: params.datasource,
@@ -323,7 +331,11 @@ cBoard.service('dataService', function ($http, $q, updateService) {
             default:
                 return [{
                     name: config.col,
-                    aggregate: config.aggregate_type
+                    aggregate: config.aggregate_type,
+                    sort: config.sort,
+                    values: config.f_values,
+                    filterType: config.f_type,
+                    top: config.f_top
                 }];
                 break;
         }
@@ -430,6 +442,54 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         return result;
     };
     this.toNumber = toNumber;
+
+    // 原始数据转为明细数据：
+    var castRawData2Columns = function (rawData, chartConfig) {
+        // keys, 二维数组，用行号作为keys，示例：[["1"], ["2"], ["3"]]
+        var keys = [];
+        for (var i = 0; i < rawData.data.length; i++) {
+            keys.push([i]);
+        }
+
+        // data, 二维数组，[["a", "b", "c"], ["A", "B", "C"]]，第一维对应列，每个列对应一个元素
+        var data = [];
+        for (var i = 0; i < rawData.columnList.length; i++) {
+            data[i] = [];
+            for (var j = 0; j < rawData.data.length; j++) {
+                data[i][j] = rawData.data[j][i];
+            }
+        }
+
+        // series，二维数组，[["列1"], ["列2"]]
+        var castedAliasSeriesName = [];
+        // seriesConfig，对象。{"列1": {type:"", valueAxisIndex: "", formatter: ""}, ...}
+        var aliasSeriesConfig = {};
+        for (var i = 0; i < rawData.columnList.length; i++) {
+            var name = rawData.columnList[i].name;
+            var aliasName = null;
+            try {
+                aliasName = chartConfig.values[0].cols[i].alias;
+            } catch (e) {
+            }
+            if (!aliasName)
+                aliasName = name;
+            castedAliasSeriesName.push([aliasName]);
+            aliasSeriesConfig[aliasName] = {
+                type: "",
+                valueAxisIndex: i,
+                formatter: null
+            };
+        }
+
+
+        return {
+            keys: keys,
+            data: data,
+            series: castedAliasSeriesName,
+            seriesConfig: aliasSeriesConfig,
+            chartConfig: chartConfig
+        };
+    };
 
     /**
      * Cast the aggregated raw data into data series

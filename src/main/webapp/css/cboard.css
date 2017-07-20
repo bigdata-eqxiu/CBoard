@@ -135,6 +135,8 @@
 .cRadar.disabled{  background-image: url(../imgs/radar.png);  }
 .cTable{  background-image: url(../imgs/table-active.png);  }
 .cTable.disabled{  background-image: url(../imgs/table.png);  }
+.cGrid{  background-image: url(../imgs/grid-active.png);  }
+.cGrid.disabled{  background-image: url(../imgs/grid.png);  }
 .cMap{  background-image: url(../imgs/map-active.png);  }
 .cMap.disabled{  background-image: url(../imgs/map.png);  }
 

@@ -57,6 +57,7 @@ cBoard.directive('dashboardWidget', function ($compile, $templateCache, dataServ
                         case 'kpi':
                             renderKpi(scope, element, attrs);
                             break;
+                        case 'grid':
                         case 'table':
                             renderTable(scope, element, attrs);
                             break;
