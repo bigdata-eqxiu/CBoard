@@ -379,15 +379,15 @@ public class DashboardController {
 
     @RequestMapping(value = "/tableToxls")
     public ResponseEntity<byte[]> tableToxls(@RequestParam(name = "data") String data) {
-        HSSFWorkbook wb = xlsProcessService.tableToxls(JSONObject.parseObject(data));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
+            HSSFWorkbook wb = xlsProcessService.tableToxls(JSONObject.parseObject(data));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             wb.write(out);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.setContentDispositionFormData("attachment", "table.xls");
             return new ResponseEntity<>(out.toByteArray(), headers, HttpStatus.CREATED);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

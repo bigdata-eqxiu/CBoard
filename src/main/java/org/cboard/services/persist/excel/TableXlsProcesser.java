@@ -66,11 +66,15 @@ public class TableXlsProcesser extends XlsProcesser {
                     }
                     if (j == colStart) {
                         if ("data".equals(property)) {
-                            if (cData.getString("data") != null && cData.getString("data").contains("%")) {
-                                cell.setCellValue(cData.getDoubleValue("raw"));
-                                cell.setCellStyle(context.getPercentStyle());
-                            } else {
-                                cell.setCellValue(cData.getDoubleValue("raw"));
+                            try{
+                                if (cData.getString("data") != null && cData.getString("data").contains("%")) {
+                                    cell.setCellValue(cData.getDoubleValue("raw"));
+                                    cell.setCellStyle(context.getPercentStyle());
+                                } else {
+                                    cell.setCellValue(cData.getDoubleValue("raw"));
+                                }
+                            }catch (Exception e){
+                                cell.setCellValue(cData.getString("data"));
                             }
                         } else {
                             cell.setCellValue(cData.getString("data"));
