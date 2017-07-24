@@ -372,18 +372,14 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     }
 
     // 取排序字段的top属性，只能有一个排序字段
-    private String assembleSqlLimit(Stream<ValueConfig> topStream, String prefix) {
+    private String assembleSqlLimit(int n, String prefix) {
         StringJoiner top = new StringJoiner("", prefix + " ", "");
         top.setEmptyValue("");
-        topStream
-                .filter(e -> e.getSort() != null && !"".equals(e.getSort()) && e.getTop()>0)
-                .map(e -> " " + (e.getTop()))
-                .filter(e -> e != null)
-                .forEach(top::add);
-
-        if(top.length() == 0)
-            top.add("50000");
-
+        if(n > 0 && n <= 100000){
+            top.add(n + "");
+        }else{
+            top.add("100");
+        }
         return top.toString();
     }
 
@@ -526,8 +522,8 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
         String limitStr = "";
         if("grid".equals(config.getChartType())){
             orderByStr = assembleSqlOrder(config.getValues().stream(), "ORDER BY");
-            havingStr = assembleSqlHaving(config.getValues().stream(), "HAVING");
-            limitStr = assembleSqlLimit(config.getValues().stream(), "LIMIT");
+//            havingStr = assembleSqlHaving(config.getValues().stream(), "HAVING");
+            limitStr = assembleSqlLimit(config.getTop(), "LIMIT");
         }
 
         StringJoiner selectColsStr = new StringJoiner(",");

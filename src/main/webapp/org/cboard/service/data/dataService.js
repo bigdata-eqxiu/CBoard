@@ -136,7 +136,7 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         updateService.updateConfig(chartConfig);
         linkDataset(datasetId, chartConfig).then(function () {
             var dataSeries = getDataSeries(chartConfig);
-            var cfg = {rows: [], columns: [], filters: [], chartType: chartConfig.chart_type};
+            var cfg = {rows: [], columns: [], filters: [], chartType: chartConfig.chart_type, top: chartConfig.top};
             cfg.rows = getDimensionConfig(chartConfig.keys);
             cfg.columns = getDimensionConfig(chartConfig.groups);
             cfg.filters = getDimensionConfig(chartConfig.filters);
@@ -276,7 +276,7 @@ cBoard.service('dataService', function ($http, $q, updateService) {
         updateService.updateConfig(params.config);
         linkDataset(params.datasetId, params.config).then(function () {
             var dataSeries = getDataSeries(params.config);
-            var cfg = {rows: [], columns: [], filters: [], chartType: params.config.chart_type};
+            var cfg = {rows: [], columns: [], filters: [], chartType: params.config.chart_type, top: params.config.top};
             cfg.rows = getDimensionConfig(params.config.keys);
             cfg.columns = getDimensionConfig(params.config.groups);
             cfg.filters = getDimensionConfig(params.config.filters);

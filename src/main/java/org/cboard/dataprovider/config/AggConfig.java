@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
  */
 public class AggConfig {
 
-    private String chartType;
+    private String chartType; // 图表类型
+    private int top; // 记录数
 
     private List<DimensionConfig> rows;
     private List<DimensionConfig> columns;
@@ -56,5 +57,13 @@ public class AggConfig {
 
     public void setChartType(String chartType) {
         this.chartType = chartType;
+    }
+
+    public int getTop() {
+        return top;
+    }
+
+    public void setTop(int top) {
+        this.top = top;
     }
 }

@@ -103,7 +103,7 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
             pie: {keys: 0, groups: 0, filters: 0, values: 0},
             kpi: {keys: -1, groups: -1, filters: 0, values: 1},
             table: {keys: 0, groups: 0, filters: 0, values: 0},
-            grid: {keys: -1, groups: -1, filters: -1, values: 0},
+            grid: {keys: -1, groups: -1, filters: 0, values: 0},
             funnel: {keys: 0, groups: -1, filters: 0, values: 0},
             sankey: {keys: 0, groups: 0, filters: 0, values: 1},
             radar: {keys: 0, groups: 0, filters: 0, values: 0},
@@ -431,6 +431,15 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
 
             $scope.curWidget.config.filters = oldConfig.filters;
             switch ($scope.curWidget.config.chart_type) {
+                case 'grid':
+                    $scope.curWidget.config.top = 100;
+                    $scope.curWidget.config.values.push({name: '', cols: []});
+                    _.each(oldConfig.values, function (v) {
+                        _.each(v.cols, function (c) {
+                            $scope.curWidget.config.values[0].cols.push(c);
+                        });
+                    });
+                    break;
                 case 'line':
                     _.each(oldConfig.values, function (v) {
                         $scope.curWidget.config.values.push({name: v.name, cols: v.cols});
@@ -541,6 +550,7 @@ cBoard.controller('widgetCtrl', function ($scope, $stateParams, $http, $uibModal
                         cols: []
                     }];
                     $scope.curWidget.config.filters = new Array();
+                    $scope.curWidget.config.top = 100;
                     break;
                 case 'funnel':
                     $scope.curWidget.config.selects = angular.copy($scope.columns);

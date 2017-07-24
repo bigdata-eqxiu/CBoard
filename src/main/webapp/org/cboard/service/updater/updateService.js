@@ -27,6 +27,10 @@ cBoard.service('updateService', function () {
                     config.valueAxis = 'vertical';
                 }
                 break;
+            case 'grid':
+                if(!config.top)
+                    config.top = 100;
+                break;
         }
     };
 
